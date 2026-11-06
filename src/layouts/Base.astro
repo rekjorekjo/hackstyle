@@ -1,0 +1,34 @@
+---
+import { withBase } from '../lib/paths';
+import '../styles/global.css';
+import { site } from '../config';
+interface Props { title?: string; description?: string; active?: string; noindex?: boolean; }
+const { title = site.title, description = site.description, active = 'home', noindex = false } = Astro.props;
+const canonical = Astro.site && !noindex ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} /><meta name="theme-color" content="#090c0c" />
+    <meta name="robots" content={import.meta.env.DEV || noindex ? "noindex,nofollow" : "index,follow"} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-i18n="skip">跳到内容</a>
+    <header class="site-header shell">
+      <a class="brand" href={withBase('/')} aria-label={`${site.name} 首页`} data-i18n-aria="brandHome"><span class="brand-icon">&gt;_</span> {site.name}<span class="brand-slash"> /</span></a>
+      <nav aria-label="主导航" data-i18n-aria="navigation">
+        <a href={withBase('/')} aria-current={active === 'home' ? 'page' : undefined} data-i18n="home">首页</a>
+        <a href={withBase('/archive/')} aria-current={active === 'archive' ? 'page' : undefined} data-i18n="archive">归档</a>
+        <a href={withBase('/categories/')} aria-current={active === 'categories' ? 'page' : undefined} data-i18n="categories">分类</a>
+        <a href={withBase('/about/')} aria-current={active === 'about' ? 'page' : undefined} data-i18n="about">关于</a>
+      </nav>
+      <button class="language-switch mono" type="button" data-language-switch aria-label="Switch interface to English" title="Switch interface to English">EN</button>
+    </header>
+    <slot />
+    <script>import '../scripts/site-language';</script>
+  </body>
+</html>
